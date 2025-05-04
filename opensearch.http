@@ -1,0 +1,120 @@
+### Получить всех пользователей
+GET https://localhost:9201/_plugins/_security/api/internalusers
+Authorization: Basic {{admin_auth}}
+Accept: application/json
+
+### Создать пользователя appuser
+PUT https://localhost:9201/_plugins/_security/api/internalusers/appuser
+Authorization: Basic {{admin_auth}}
+Content-Type: application/json
+
+{
+  "password": "StrongPassword123!",
+  "backend_roles": ["admin"]
+}
+
+###
+
+### Удалить пользователя appuser
+DELETE https://localhost:9201/_plugins/_security/api/internalusers/appuser
+Authorization: Basic {{admin_auth}}
+
+###
+
+### Удалить индекс geo_metadata_index
+DELETE https://localhost:9201/geo_metadata_index
+Authorization: Basic {{admin_auth}}
+Content-Type: application/json
+
+###
+
+### Пример поиска в OpenSearch
+POST https://localhost:9201/geo_metadata_index/_search
+Authorization: Basic {{admin_auth}}
+Content-Type: application/json
+
+{
+  "from": 0,
+  "size": 10,
+  "sort": [
+    {
+      "indexedAt": {
+        "order": "desc"
+      }
+    }
+  ],
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "terms": {
+            "objectId": [
+              "fc0651ac-9f6d-4a02-91d2-5e3f60c3c25c",
+              "9ade5714-5abb-4748-a427-6d8d6345b265",
+              "a3610f6f-6cae-4b5b-9e14-614b3b8ffba5"
+            ]
+          }
+        },
+        {
+          "match": {
+            "anyText": {
+              "query": "экологический мониторинг"
+            }
+          }
+        },
+        {
+          "term": {
+            "dcType": {
+              "value": "Dataset"
+            }
+          }
+        },
+        {
+          "term": {
+            "region": {
+              "value": "RU-SEV"
+            }
+          }
+        },
+        {
+          "terms": {
+            "topicCategory": [
+              "environment",
+              "biota"
+            ]
+          }
+        },
+        {
+          "range": {
+            "temporalExtent.start": {
+              "gte": "2022-01-01",
+              "lte": "2023-12-31"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+### Получить настройки идекса
+GET https://localhost:9222/geo_metadata_index/_mapping
+Authorization: Basic {{admin_auth}}
+Accept: application/json
+
+### Получить настройки идекса
+GET https://localhost:9222/geo_metadata_index/_settings
+Authorization: Basic {{admin_auth}}
+Accept: application/json
+
+### Получить настройки идекса
+GET https://localhost:9222/geo_metadata_index/_analyze
+Authorization: Basic {{admin_auth}}
+Content-Type: application/json
+
+{
+  "analyzer": "autocomplete_analyzer",
+  "text": "экология"
+}
+
+
