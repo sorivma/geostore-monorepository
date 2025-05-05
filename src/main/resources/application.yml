@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: geo-orchestrator-service
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: never
+
+  liquibase:
+    change-log: classpath:/db/changelog/master.xml
+    enabled: true
+
+  rabbitmq:
+    host: ${RMQ_HOST}
+    port: ${RMQ_PORT}
+    username: ${RMQ_USERNAME}
+    password: ${RMQ_PASSWORD}
+    virtual-host: ${RMQ_VHOST}
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+
+  endpoint:
+    prometheus:
+      access: read_only
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+services:
+  geometry-service:
+    url: ${GEOMETRY_SERVICE_URL}
+  metadata-service:
+    url: ${METADATA_SERVICE_URL}
+  search-service:
+    url: ${SEARCH_SERVICE_URL}
+  titiler:
+    url: ${TITILER_URL}
+
+minio:
+  endpoint: ${MINIO_ENDPOINT}
+  bucket: ${MINIO_BUCKET}
+  accessKey: ${MINIO_ACCESS_KEY}
+  secretKey: ${MINIO_SECRET_KEY}
+
+render:
+  base-url: ${TITILER_URL}
+  tile-matrix-set-id: ${TITILER_MATRIX_SET_ID}
+
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
