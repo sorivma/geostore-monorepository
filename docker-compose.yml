@@ -1,0 +1,69 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-projects-data:/var/lib/postgresql/data
+    networks:
+      - geo-orchestrator-net
+
+  geo-orchestrator-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: geo-orchestrator-service
+    environment:
+      SPRING_PROFILES_ACTIVE: logstash-logs, rest-audit-logs, jwt-mock
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      RMQ_HOST: ${RMQ_HOST}
+      RMQ_PORT: ${RMQ_PORT}
+      RMQ_USERNAME: ${RMQ_USERNAME}
+      RMQ_PASSWORD: ${RMQ_PASSWORD}
+      RMQ_VHOST: ${RMQ_VHOST}
+
+      GEOMETRY_SERVICE_URL: ${GEOMETRY_SERVICE_URL}
+      METADATA_SERVICE_URL: ${METADATA_SERVICE_URL}
+      SEARCH_SERVICE_URL: ${SEARCH_SERVICE_URL}
+
+      TITILER_URL: ${TITILER_URL}
+      TITILER_MATRIX_SET_ID: ${TITILER_MATRIX_SET_ID}
+
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+
+
+      ISSUER_URI: ${ISSUER_URI}
+
+      LOGSTASH_HOST: ${LOGSTASH_HOST}
+      LOGSTASH_PORT: ${LOGSTASH_PORT}
+      LOGSTASH_KEEP_ALIVE: ${LOGSTASH_KEEP_ALIVE}
+      LOGSTASH_RECONNECT: ${LOGSTASH_RECONNECT}
+
+    depends_on:
+      - postgres
+    ports:
+      - "8088:8080"
+    networks:
+      - geo-orchestrator-net
+      - geo-net
+
+volumes:
+  postgres-projects-data:
+
+networks:
+  geo-orchestrator-net:
+  geo-net:
+    external: true
