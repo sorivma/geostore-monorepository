@@ -1,0 +1,52 @@
+services:
+
+  minio:
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
+    container_name: "geo-minio"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"  
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - geo-raster-net
+      - geo-net
+
+  titiler:
+    image: ghcr.io/developmentseed/titiler:latest
+    container_name: "titiler-render-server"
+    ports:
+      - "8000:80"
+    environment:
+      TITILER_DOMAIN_NAME: http://localhost:8000
+
+      AWS_VIRTUAL_HOSTING: FALSE
+      AWS_HTTPS: NO
+      AWS_ACCESS_KEY_ID: minioadmin
+      AWS_SECRET_ACCESS_KEY: minioadmin
+      AWS_REGION: us-east-1
+      AWS_S3_ENDPOINT: minio:9000
+
+      GDAL_DISABLE_READDIR_ON_OPEN: "YES"
+      VSI_CACHE: "FALSE"
+      CPL_VSIL_CURL_USE_HEAD: "NO"
+      CPL_VSIL_CURL_USE_CACHE: "NO"
+      CPL_VSIL_CURL_ALLOWED_EXTENSIONS: .tif
+      GDAL_CACHEMAX: "0"
+    depends_on:
+      - minio
+    networks:
+      - geo-raster-net
+      - geo-net
+
+volumes:
+  minio_data:
+
+networks:
+  geo-raster-net:
+  geo-net:
+    external: true
