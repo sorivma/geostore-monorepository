@@ -15,5 +15,7 @@
 - [geo-message-broker](https://github.com/sorivma/geo-message-broker) - проект инстанса RabbitMQ, для мессенджинга между сервисами
 - [geo-raster](https://github.com/sorivma/geo-raster) - проект инстансов MinIO и Titiler выступающих в ролях рендер сервера и хранилища GeoTIFF файлов
 
+## Общая статистика по строкам кода
 
+![Общая статистика по строкам кода](./bench.png)
  
