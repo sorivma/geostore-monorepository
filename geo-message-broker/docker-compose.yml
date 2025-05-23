@@ -1,0 +1,21 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: geo-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: geo-user
+      RABBITMQ_DEFAULT_PASS: geo-user
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - geo-net
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  geo-net:
+    external: true
