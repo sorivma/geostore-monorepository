@@ -1,0 +1,56 @@
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.19.1
+    container_name: obensearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "DISABLE_INSTALL_DEMO_CONFIG=false"
+      - "DISABLE_SECURITY_PLUGIN=false"
+      - "OPENSEARCH_SECURITY_SSL_ONLY=false"
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=SamplePassword1!"
+      
+      - "plugins.security.ssl.http.enabled=false"
+    volumes:
+      - ./certs:/usr/share/opensearch/config/certs
+      - opensearch_data:/usr/share/opensearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      geo-net:
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.19.1
+    container_name: opensearch-dashboards
+    ports:
+      - "5601:5601"
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=false"
+      - "OPENSEARCH_SSL_VERIFICATION_MODE=none"
+    networks:
+      geo-net:
+    depends_on:
+      - opensearch
+
+  logstash:
+    image: opensearchproject/logstash-oss-with-opensearch-output-plugin:7.16.2
+    container_name: logstash
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5000:5000"
+    depends_on:
+      - opensearch
+    networks:
+      - geo-net
+
+networks:
+  geo-net:
+    external: true
+
+volumes:
+  opensearch_data: 
