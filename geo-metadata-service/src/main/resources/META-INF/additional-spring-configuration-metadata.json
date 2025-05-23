@@ -1,0 +1,23 @@
+{
+  "properties": [
+    {
+      "name": "logback.logstash.keepAlive",
+      "type": "java.lang.String",
+      "description": "Keep alive for logstash logback appender connection."
+    },
+    {
+      "name": "logback.logstash.reconnectDelay",
+      "type": "java.lang.String",
+      "description": "Reconnection delay for logstash logback appender."
+    },
+    {
+      "name": "logback.logstash.port",
+      "type": "java.lang.String",
+      "description": "Logstash port."
+    },
+    {
+      "name": "logback.logstash.host",
+      "type": "java.lang.String",
+      "description": "Logstash host."
+    }
+  ] }
