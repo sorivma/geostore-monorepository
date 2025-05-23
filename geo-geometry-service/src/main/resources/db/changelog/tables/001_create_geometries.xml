@@ -1,0 +1,44 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="001-create-geometries-table" author="geoarch">
+
+        <createTable tableName="geometries">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="object_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="geometry" type="geometry">
+                <constraints nullable="false"/>
+            </column>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+        </createTable>
+
+        <createIndex indexName="idx_object_version" tableName="geometries">
+            <column name="object_id"/>
+            <column name="version"/>
+        </createIndex>
+
+        <createIndex indexName="idx_object_active" tableName="geometries">
+            <column name="object_id"/>
+        </createIndex>
+
+        <sql>
+            CREATE INDEX idx_geometry_gist ON geometries USING GIST (geometry);
+        </sql>
+
+    </changeSet>
+
+</databaseChangeLog>

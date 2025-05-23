@@ -1,0 +1,58 @@
+services:
+
+  postgres:
+    image: postgis/postgis:17-3.5
+    container_name: geo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - geo-geometry-net
+
+  geo-geometry-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: geo-geometry-service
+    environment:
+      SPRING_PROFILES_ACTIVE: logstash-logs,rest-audit-logs, jwt-mock
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+      RMQ_HOST: ${RMQ_HOST}
+      RMQ_PORT: ${RMQ_PORT}
+      RMQ_USERNAME: ${RMQ_USERNAME}
+      RMQ_PASSWORD: ${RMQ_PASSWORD}
+      RMQ_VHOST: ${RMQ_VHOST}
+
+      ISSUER_URI: ${ISSUER_URI}
+
+      LOGSTASH_HOST: ${LOGSTASH_HOST}
+      LOGSTASH_PORT: ${LOGSTASH_PORT}
+      LOGSTASH_KEEP_ALIVE: ${LOGSTASH_KEEP_ALIVE}
+      LOGSTASH_RECONNECT: ${LOGSTASH_RECONNECT}
+    depends_on:
+      - postgres
+    ports:
+      - "8086:8080"
+    networks:
+      - geo-geometry-net
+      - geo-net
+
+volumes:
+  postgres-data:
+
+networks:
+  geo-geometry-net:
+  geo-net:
+    external: true
