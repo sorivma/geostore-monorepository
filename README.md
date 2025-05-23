@@ -10,7 +10,7 @@
 - [geo-frontend](https://github.com/sorivma/geo-frontend) — клиентское приложение (React SPA)
 
 ## Инфраструктура
-- [geo-auth](https://github.com/sorivma/geo-auth) — проект инстанса Keycloak, используемым в проекте
+- [geo-auth](https://github.com/sorivma/geo-auth) — проект инстанса Keycloak
 - [geo-observability](https://github.com/sorivma/geo-observability) - проект инстансов OpenSearch и OpenSearch Dashboards
 - [geo-message-broker](https://github.com/sorivma/geo-message-broker) - проект инстанса RabbitMQ, для мессенджинга между сервисами
 - [geo-raster](https://github.com/sorivma/geo-raster) - проект инстансов MinIO и Titiler выступающих в ролях рендер сервера и хранилища GeoTIFF файлов
