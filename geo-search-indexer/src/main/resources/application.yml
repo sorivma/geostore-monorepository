@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: geo-search-indexer
+
+  rabbitmq:
+    host: ${RMQ_HOST}
+    port: ${RMQ_PORT}
+    username: ${RMQ_USERNAME}
+    password: ${RMQ_PASSWORD}
+    virtual-host: ${RMQ_VHOST}
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 10
+          initial-interval: 1000ms
+          max-interval: 10000ms
+          multiplier: 2
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${ISSUER_URI}
+
+opensearch:
+  host: ${OPENSEARCH_HOST}
+  port: ${OPENSEARCH_PORT}
+  scheme: ${OPENSEARCH_SCHEME}
+  username: ${OPENSEARCH_USERNAME}
+  password: ${OPENSEARCH_PASSWORD}
+  index: ${OPENSEARCH_INDEX}
+  initialize: ${OPENSEARCH_INITIALIZE}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus"
+
+  endpoint:
+    prometheus:
+      access: read_only
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logback:
+  logstash:
+    host: ${LOGSTASH_HOST}
+    port: ${LOGSTASH_PORT}
+    keepAlive: ${LOGSTASH_KEEP_ALIVE}
+    reconnectDelay: ${LOGSTASH_RECONNECT}

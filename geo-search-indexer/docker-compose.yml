@@ -1,0 +1,105 @@
+services:
+  geo-opensearch:
+    image: opensearchproject/opensearch:2.19.1
+    container_name: geo-opensearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+    ports:
+      - "9222:9200"
+
+    healthcheck:
+      test: curl -s -k https://localhost:9200 > /dev/null || exit 1
+      interval: 3s
+      timeout: 10s
+      retries: 25
+
+    volumes:
+      - geo-opensearch-data:/usr/share/opensearch/data
+      - ./config/init-opensearch.sh:/usr/local/bin/init-opensearch.sh
+      - ./config/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - ./certs/root-ca.pem:/usr/share/opensearch/config/root-ca.pem
+      - ./certs/node.pem:/usr/share/opensearch/config/node.pem
+      - ./certs/node.key:/usr/share/opensearch/config/node.key
+      - ./certs/admin.pem:/usr/share/opensearch/config/admin.pem
+      - ./certs/admin.key:/usr/share/opensearch/config/admin.key
+    networks:
+      - geo-indexer-net
+
+  geo-opensearch-init:
+    image: curlimages/curl:latest
+    container_name: geo-opensearch-init
+    environment:
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD}
+      OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME}
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD}
+    depends_on:
+      geo-opensearch:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "/init-opensearch.sh"]
+    deploy:
+      restart_policy:
+        condition: none
+    restart: no
+    labels:
+      auto.remove: "true"
+    volumes:
+      - ./config/init-opensearch.sh:/init-opensearch.sh:ro
+    networks:
+      - geo-indexer-net
+
+  geo-indexer-service:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: geo-indexer-service
+    environment:
+      SPRING_PROFILES_ACTIVE: logstash-logs, rest-audit-logs, jwt-mock
+
+      OPENSEARCH_HOST: ${OPENSEARCH_HOST}
+      OPENSEARCH_PORT: ${OPENSEARCH_PORT}
+      OPENSEARCH_SCHEME: ${OPENSEARCH_SCHEME}
+      OPENSEARCH_USERNAME: ${OPENSEARCH_USERNAME}
+      OPENSEARCH_PASSWORD: ${OPENSEARCH_PASSWORD}
+      OPENSEARCH_INDEX: ${OPENSEARCH_INDEX}
+      OPENSEARCH_INITIALIZE: ${OPENSEARCH_INITIALIZE}
+
+      RMQ_HOST: ${RMQ_HOST}
+      RMQ_PORT: ${RMQ_PORT}
+      RMQ_USERNAME: ${RMQ_USERNAME}
+      RMQ_PASSWORD: ${RMQ_PASSWORD}
+      RMQ_VHOST: ${RMQ_VHOST}
+
+      ISSUER_URI: ${ISSUER_URI}
+
+      LOGSTASH_HOST: ${LOGSTASH_HOST}
+      LOGSTASH_PORT: ${LOGSTASH_PORT}
+      LOGSTASH_KEEP_ALIVE: ${LOGSTASH_KEEP_ALIVE}
+      LOGSTASH_RECONNECT: ${LOGSTASH_RECONNECT}
+
+    entrypoint: ["/bin/sh", "-c", "java -Djavax.net.ssl.trustStore=/certs/truststore.jks -Djavax.net.ssl.trustStorePassword=changeit -jar app.jar"]
+    depends_on:
+      geo-opensearch-init:
+        condition: service_completed_successfully
+    ports:
+      - "8087:8080"
+    volumes:
+      - ./certs:/certs:ro
+    networks:
+      - geo-indexer-net
+      - geo-net
+
+volumes:
+  geo-opensearch-data:
+
+networks:
+  geo-indexer-net:
+  geo-net:
+    external: true

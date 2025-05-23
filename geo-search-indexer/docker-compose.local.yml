@@ -1,0 +1,28 @@
+services:
+  geo-opensearch-local:
+    image: opensearchproject/opensearch:latest
+    container_name: geo-opensearch-local
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./config/opensearch.yml:/usr/share/opensearch/config/opensearch.yml
+      - ./certs/root-ca.pem:/usr/share/opensearch/config/root-ca.pem
+      - ./certs/node.pem:/usr/share/opensearch/config/node.pem
+      - ./certs/node.key:/usr/share/opensearch/config/node.key
+      - ./certs/admin.pem:/usr/share/opensearch/config/admin.pem
+      - ./certs/admin.key:/usr/share/opensearch/config/admin.key
+    ports:
+      - "9201:9200"
+      - "9601:9600"
+    networks:
+      - opensearch-net
+
+networks:
+  opensearch-net:
+    driver: bridge
