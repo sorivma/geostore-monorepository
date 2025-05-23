@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+     https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="002-create-layer-tables" author="geo">
+        <!-- Основная таблица слоёв -->
+        <createTable tableName="layers">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="project_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_num" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="geometry_type" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Векторные данные слоя -->
+        <createTable tableName="vector_layer_data">
+            <column name="layer_id" type="UUID">
+                <constraints primaryKey="true" nullable="false" referencedTableName="layers" referencedColumnNames="id" foreignKeyName="fk_vector_layer"/>
+            </column>
+            <column name="object_ids" type="UUID[]">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fill_color" type="TEXT" defaultValue="#3388ff"/>
+            <column name="stroke_color" type="TEXT" defaultValue="#000000"/>
+            <column name="stroke_width" type="DOUBLE PRECISION" defaultValueNumeric="1.0"/>
+        </createTable>
+
+        <!-- Растровые данные слоя -->
+        <createTable tableName="raster_layer_data">
+            <column name="layer_id" type="UUID">
+                <constraints primaryKey="true" nullable="false" referencedTableName="layers" referencedColumnNames="id" foreignKeyName="fk_raster_layer"/>
+            </column>
+            <column name="cog_url" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tilejson_url" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attribution" type="TEXT"/>
+            <column name="opacity" type="DOUBLE PRECISION" defaultValueNumeric="1.0"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

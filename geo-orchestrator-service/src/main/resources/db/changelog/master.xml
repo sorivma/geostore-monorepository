@@ -1,0 +1,10 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Таблицы -->
+    <include file="tables/001_create_projects.xml" relativeToChangelogFile="true" />
+    <include file="tables/002_create_layer_tables.xml" relativeToChangelogFile="true" />
+</databaseChangeLog>
