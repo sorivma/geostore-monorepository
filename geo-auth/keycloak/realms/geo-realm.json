@@ -1,0 +1,130 @@
+{
+  "realm": "geo",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "geo-service",
+      "secret": "geo-secret",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ]
+    },
+    {
+      "clientId": "geo-frontend",
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ]
+    }
+  ],
+  "roles": {
+    "client": {
+      "geo-service": [
+        {
+          "name": "ROLE_VIEWER"
+        },
+        {
+          "name": "ROLE_EDITOR"
+        },
+        {
+          "name": "ROLE_ADMIN"
+        }
+      ]
+    }
+  },
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "firstName": "Alice",
+      "lastName": "Example",
+      "email": "alice@example.com",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "alice123",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "geo-service": [
+          "ROLE_VIEWER",
+          "ROLE_EDITOR"
+        ]
+      },
+      "attributes": {
+        "project_tags_read": [
+          "access:gis"
+        ],
+        "project_tags_write": [
+          "access:gis"
+        ]
+      }
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "firstName": "Bob",
+      "lastName": "Reader",
+      "email": "bob@example.com",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bob123",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "geo-service": [
+          "ROLE_VIEWER"
+        ]
+      },
+      "attributes": {
+        "project_tags_read": [
+          "access:gis"
+        ],
+        "project_tags_write": [
+          "access:gis"
+        ]
+      }
+    },
+    {
+      "username": "carol",
+      "enabled": true,
+      "firstName": "Carol",
+      "lastName": "Admin",
+      "email": "carol@example.com",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "carol123",
+          "temporary": false
+        }
+      ],
+      "clientRoles": {
+        "geo-service": [
+          "ROLE_ADMIN"
+        ]
+      }
+    }
+  ]
+}

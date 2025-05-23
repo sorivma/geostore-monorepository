@@ -1,0 +1,48 @@
+services:
+  
+  keycloak-db:
+    image: postgres:17
+    container_name: keycloak-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - keycloak-db-data:/var/lib/postgresql/data
+    networks:
+      - keycloak-net
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.2
+    container_name: keycloak
+    command: start-dev --import-realm --hostname=${KEYCLOAK_HOST}
+    restart: unless-stopped
+    environment:
+      # Default admin user
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+
+      # DB config
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://${KEYCLOAK_DB_HOST}:5432/${KEYCLOAK_DB}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+
+    volumes:
+      - ./keycloak/realms:/opt/keycloak/data/import
+    ports:
+      - "18080:8080"
+    depends_on:
+      - keycloak-db
+    networks:
+      keycloak-net:
+      geo-net:
+
+volumes:
+  keycloak-db-data:
+
+networks:
+  geo-net:
+    external: true
+  keycloak-net:
